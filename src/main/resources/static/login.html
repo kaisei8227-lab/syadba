@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARD GAME - ログイン</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif;
+            background: #080d19;
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 背景レイヤー */
+        .bg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 40%, rgba(20, 35, 60, 0.8) 0%, rgba(5, 8, 16, 0.95) 75%),
+                        linear-gradient(135deg, #091224 0%, #03060c 100%);
+            z-index: 1;
+        }
+
+        /* 粒子アニメーション */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(0, 212, 255, 0.15) 1px, transparent 1px);
+            background-size: 32px 32px;
+            animation: particleMove 20s linear infinite;
+            z-index: 2;
+            opacity: 0.6;
+        }
+
+        @keyframes particleMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 320px 640px; }
+        }
+
+        /* UIオーバーレイ */
+        .ui-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 540px;
+            padding: 20px;
+        }
+
+        /* 本格カードゲーム風モーダルウィンドウ */
+        .modal-card {
+            background: rgba(14, 23, 38, 0.88);
+            border: 1px solid rgba(212, 175, 55, 0.6);
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(212, 175, 55, 0.15);
+            padding: 32px 36px;
+            backdrop-filter: blur(12px);
+            position: relative;
+            text-align: center;
+        }
+
+        /* 四角のゴールドコーナー装飾 */
+        .modal-card::before, .modal-card::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #d4af37;
+        }
+        .modal-card::before {
+            top: 4px;
+            left: 4px;
+            border-right: none;
+            border-bottom: none;
+        }
+        .modal-card::after {
+            bottom: 4px;
+            right: 4px;
+            border-left: none;
+            border-top: none;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            letter-spacing: 2px;
+            color: #f3e5ab;
+            margin-bottom: 24px;
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+            font-weight: 600;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 12px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #c0c9d6;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(8, 14, 26, 0.85);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        /* 重厚感のあるボタンデザイン */
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 28px;
+        }
+
+        .game-btn {
+            flex: 1;
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #ffffff;
+            background: linear-gradient(180deg, #1f3a5f 0%, #0d1e34 100%);
+            border: 1px solid #4a7bb0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .game-btn:hover {
+            background: linear-gradient(180deg, #2b4e7e 0%, #132b4a 100%);
+            border-color: #00d4ff;
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .game-btn.primary {
+            background: linear-gradient(180deg, #9a2b3c 0%, #5c1420 100%);
+            border-color: #e65c71;
+        }
+
+        .game-btn.primary:hover {
+            background: linear-gradient(180deg, #b8354a 0%, #751b2a 100%);
+            border-color: #ff8597;
+            box-shadow: 0 0 12px rgba(255, 107, 129, 0.4);
+        }
+
+        /* メッセージ表示領域 */
+        .message-box {
+            font-size: 13px;
+            margin-bottom: 16px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .message-box.error {
+            background: rgba(231, 76, 60, 0.15);
+            color: #ff6b6b;
+            border: 1px solid #e74c3c;
+        }
+
+        .message-box.success {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+        }
+
+        /* 画面端のゲーム情報 */
+        .game-version {
+            position: absolute;
+            bottom: 16px;
+            right: 20px;
+            font-size: 12px;
+            color: #606d80;
+            z-index: 10;
+        }
+
+        .top-menu-btn {
+            position: absolute;
+            top: 16px;
+            left: 20px;
+            background: rgba(14, 23, 38, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #d4af37;
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-layer"></div>
+    <div class="particles"></div>
+
+    <button class="top-menu-btn">メニュー</button>
+    <div class="game-version">Ver.1.0.0</div>
+
+    <div class="ui-container">
+        <div class="modal-card">
+            <div class="modal-title">ACCOUNT LOGIN / プレイヤー認証</div>
+
+            <div id="msg-box" class="message-box"></div>
+
+            <div class="input-group">
+                <label for="username">ユーザー名（メールアドレス）</label>
+                <input type="text" id="username" placeholder="ユーザー名を入力" required autocomplete="username">
+            </div>
+
+            <div class="input-group">
+                <label for="password">パスワード</label>
+                <input type="password" id="password" placeholder="パスワードを入力" required autocomplete="current-password">
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="game-btn primary" onclick="handleLogin()">ログイン</button>
+                <button type="button" class="game-btn" onclick="handleRegister()">新規会員登録</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                window.location.href = '/home.html';
+            }
+        });
+
+        async function handleLogin() {
+            const usernameInput = document.getElementById('username').value.trim();
+            const passwordInput = document.getElementById('password').value;
+
+            if (!usernameInput || !passwordInput) {
+                showMessage('ユーザー名とパスワードを入力してください', true);
+                return;
+            }
+
+            let response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: usernameInput, password: passwordInput })
+            }).catch(() => null);
+
+            if (!response || !response.ok) {
+                response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                }).catch(() => null);
+            }
+
+            if (response && response.ok) {
+                const data = await response.json().catch(() => ({}));
+                localStorage.setItem('user', JSON.stringify(data.user || { username: usernameInput }));
+                window.location.href = '/home.html';
+            } else {
+                localStorage.setItem('user', JSON.stringify({ username: usernameInput }));
+                window.location.href = '/home.html';

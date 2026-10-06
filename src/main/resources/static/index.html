@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+	<script src="/js/auth-check.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadowcard - 対戦</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- SockJS & STOMP ライブラリ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+
+    <!-- 接続・参加オーバーレイ（ロビー） -->
+    <div id="lobby-section">
+        <div class="lobby-card">
+            <h1>SHADOWCARD</h1>
+            <p id="connection-status">クラスを選択して対戦部屋に参加してください</p>
+            
+            <div style="margin: 20px 0;">
+                <label for="class-select" style="font-size: 14px; color: #aaa;">使用クラス: </label>
+                <select id="class-select" style="padding: 8px; background: #0f3460; color: #fff; border: 1px solid #1f4068; border-radius: 4px;">
+                    <option value="貴族">貴族</option>
+                    <option value="平民">平民</option>
+                    <option value="魔法使い">魔法使い</option>
+                </select>
+            </div>
+
+            <button id="connect-btn" onclick="joinRoom()">対戦開始</button>
+            <br><br>
+            <button style="background: #555; padding: 8px 16px; border: none; color: white; border-radius: 4px; cursor: pointer;" onclick="location.href='/home.html'">ホームへ戻る</button>
+        </div>
+    </div>
+
+    <!-- 勝敗ポップアップ -->
+    <div id="result-overlay" style="display: none;">
+        <div class="modal-content">
+            <h1 id="result-text">VICTORY</h1>
+            <button onclick="backToLobby()">ホームへ戻る</button>
+        </div>
+    </div>
+
+    <!-- メインゲームバトルフィールド -->
+    <div id="game-section" style="display: none;">
+        
+        <!-- ターン通知バナー -->
+        <div id="turn-indicator" class="turn-banner">YOUR TURN</div>
+
+        <!-- 相手エリア -->
+        <div class="player-zone enemy-zone">
+            <div class="leader-container">
+                <div class="leader-portrait enemy-portrait">
+                    <div class="hp-badge" id="enemy-hp">HP: 20</div>
+                </div>
+            </div>
+            <div class="board-container" id="enemy-board"></div>
+            <div class="pp-container enemy-pp">
+                <span id="enemy-pp">PP: 0/0</span>
+            </div>
+        </div>
+
+        <!-- 中央：操作 & ターン終了エリア -->
+        <div class="center-controls">
+            <button id="end-turn-btn" onclick="endTurn()">ターン<br>終了</button>
+        </div>
+
+        <!-- 自分エリア -->
+        <div class="player-zone my-zone">
+            <div class="pp-container my-pp">
+                <span id="my-pp">PP: 1/1</span>
+            </div>
+            <div class="board-container" id="my-board"></div>
+            <div class="leader-container" id="my-leader">
+                <div class="leader-portrait my-portrait">
+                    <div class="hp-badge" id="my-hp">HP: 20</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- あなたの手札 -->
+        <div class="hand-container" id="my-hand"></div>
+
+    </div>
+
+    <!-- app.js を呼び出し -->
+    <script src="/js/app.js"></script>
+</body>
+</html>

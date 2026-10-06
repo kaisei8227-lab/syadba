@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>カードゲーム - デッキ構築</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #16213e;
+            padding: 15px 20px;
+            border-radius: 8px;
+        }
+        h2 { margin: 0; color: #00b4d8; }
+        .back-btn {
+            background: #0f3460;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .card-pool, .deck-pool {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 8px;
+            flex: 1;
+            min-height: 500px;
+        }
+        h3 { border-bottom: 2px solid #0f3460; padding-bottom: 10px; margin-top: 0; }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        .card-item {
+            background: #0f3460;
+            border: 1px solid #1f4068;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .card-item:hover { background: #1f4068; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>🎴 デッキ構築</h2>
+    <button class="back-btn" onclick="location.href='/home.html'">ホームへ戻る</button>
+</header>
+
+<div class="container">
+    <div class="card-pool">
+        <h3>所有カード一覧</h3>
+        <div id="available-cards" class="card-grid"></div>
+    </div>
+    
+    <div class="deck-pool">
+        <h3>現在のデッキ (<span id="deck-count">0</span>/30)</h3>
+        <div id="deck-cards" class="card-grid"></div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const storedUser = localStorage.getItem('user');
+        if (!storedUser) {
+            window.location.href = '/login.html';
+            return;
+        }
+        
+        // カード一覧の取得（既存の REST API を呼び出し）
+        fetch('/api/cards')
+            .then(res => res.json())
+            .then(cards => {
+                renderCardPool(cards);
+            });
+    });
+
+    function renderCardPool(cards) {
+        const container = document.getElementById('available-cards');
+        container.innerHTML = '';
+        cards.forEach(card => {
+            const el = document.createElement('div');
+            el.className = 'card-item';
+            el.innerHTML = `
+                <div><strong>${card.name}</strong></div>
+                <div style="font-size:12px;">コスト: ${card.cost}</div>
+                <div style="font-size:12px;">⚔️️${card.attack} / ❤️${card.defense}</div>
+            `;
+            container.appendChild(el);
+        });
+    }
+</script>
+
+</body>
+</html>

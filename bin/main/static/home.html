@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カードゲーム - ホーム</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #090c15;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        /* 背景演出 */
+        .bg-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 40%, rgba(30, 50, 100, 0.4) 0%, rgba(5, 8, 20, 0.95) 80%);
+            z-index: 1;
+        }
+
+        /* 1. TOP HEADER */
+        .top-bar {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: linear-gradient(180deg, rgba(10, 15, 30, 0.9) 0%, rgba(10, 15, 30, 0) 100%);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #1f4068;
+            border: 2px solid #f39c12;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+        }
+
+        .user-info .username {
+            font-size: 16px;
+            font-weight: bold;
+            color: #e0e6ed;
+        }
+
+        .level-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .level-badge {
+            font-size: 12px;
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .level-bar-bg {
+            width: 120px;
+            height: 8px;
+            background: #16213e;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #1f4068;
+        }
+
+        .level-bar-fill {
+            width: 65%;
+            height: 100%;
+            background: linear-gradient(90deg, #f39c12, #f1c40f);
+        }
+
+        .currencies {
+            display: flex;
+            gap: 20px;
+        }
+
+        .currency-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid #1f4068;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .currency-icon {
+            font-size: 16px;
+        }
+
+        /* 2. MAIN CENTER AREA */
+        .main-content {
+            position: relative;
+            z-index: 5;
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 80px;
+        }
+
+        /* 左側バナー */
+        .side-banners {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 220px;
+        }
+
+        .banner-card {
+            background: linear-gradient(135deg, rgba(22, 33, 62, 0.8), rgba(15, 52, 96, 0.8));
+            border-left: 4px solid #00b4d8;
+            padding: 12px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .banner-card:hover {
+            transform: translateX(5px);
+            border-left-color: #f39c12;
+            background: linear-gradient(135deg, rgba(30, 45, 80, 0.9), rgba(20, 65, 120, 0.9));
+        }
+
+        .banner-title {
+            font-size: 12px;
+            color: #a6b0cf;
+        }
+
+        .banner-desc {
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            margin-top: 2px;
+        }
+
+        /* 中央キャラクタービジュアル */
+        .hero-character {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            height: 85%;
+            pointer-events: none;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .hero-placeholder {
+            font-size: 180px;
+            filter: drop-shadow(0 0 30px rgba(0, 180, 216, 0.4));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* 右側 ランクマッチボタン */
+        .battle-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .rank-button {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #e94560 0%, #801336 70%, #4a0e17 100%);
+            border: 4px solid #f39c12;
+            box-shadow: 0 0 30px rgba(233, 69, 96, 0.6), inset 0 0 20px rgba(243, 156, 18, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .rank-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 50px rgba(233, 69, 96, 0.9), inset 0 0 30px rgba(243, 156, 18, 0.8);
+        }
+
+        .rank-icon {
+            font-size: 60px;
+            margin-bottom: 5px;
+        }
+
+        .rank-title {
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .rank-sub {
+            font-size: 13px;
+            color: #f39c12;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        /* 3. BOTTOM NAVIGATION */
+        .bottom-nav {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px 0 25px 0;
+            background: linear-gradient(0deg, rgba(10, 15, 30, 0.95) 0%, rgba(10, 15, 30, 0) 100%);
+        }
+
+        .nav-item {
+            width: 110px;
+            padding: 12px 8px;
+            background: rgba(15, 52, 96, 0.6);
+            border: 1px solid #1f4068;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: linear-gradient(180deg, #0f3460 0%, #00b4d8 100%);
+            border-color: #00b4d8;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 180, 216, 0.4);
+        }
+
+        .nav-item.logout-item:hover {
+            background: linear-gradient(180deg, #600f0f 0%, #d80000 100%);
+            border-color: #ff4d4d;
+            box-shadow: 0 5px 15px rgba(216, 0, 0, 0.4);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-overlay"></div>
+
+<!-- ヘッダーエリア -->
+<header class="top-bar">
+    <div class="user-profile">
+        <div class="avatar">🧙‍♀️</div>
+        <div class="user-info">
+            <div class="username" id="display-username">プレイヤー</div>
+            <div class="level-container">
+                <span class="level-badge">Lv.12</span>
+                <div class="level-bar-bg">
+                    <div class="level-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="currencies">
+        <div class="currency-item">
+            <span class="currency-icon">🪙</span>
+            <span>26,950</span>
+        </div>
+        <div class="currency-item">
+            <span class="currency-icon">💎</span>
+            <span>3,600</span>
+        </div>
+    </div>
+</header>
+
+<!-- メインコンテンツ -->
+<main class="main-content">
+    <!-- 左側キャンペーン -->
+    <div class="side-banners">
+        <div class="banner-card">
+            <div class="banner-title">キャンペーン</div>
+            <div class="banner-desc">勝利報酬2倍開催中！</div>
+        </div>
+        <div class="banner-card">
+            <div class="banner-title">バトルパス</div>
+            <div class="banner-desc">シーズン 1 進行中</div>
+        </div>
+        <div class="banner-card">
+            <div class="banner-title">ミッション</div>
+            <div class="banner-desc">デイリー達成で100ルピ</div>
+        </div>
+    </div>
+
+    <!-- 中央キャラクター -->
+    <div class="hero-character">
+        <div class="hero-placeholder">⚔️</div>
+    </div>
+
+    <!-- 右側対戦ボタン -->
+    <div class="battle-section">
+        <div class="rank-button" onclick="goToGame()">
+            <div class="rank-icon">🏆</div>
+            <div class="rank-title">ランクマッチ</div>
+            <div class="rank-sub">対戦を開始する</div>
+        </div>
+    </div>
+</main>
+
+<!-- フッターナビゲーション -->
+<nav class="bottom-nav">
+    <div class="nav-item" onclick="alert('ソロプレイは準備中です')">
+        <div class="nav-icon">📖</div>
+        <div class="nav-label">ソロプレイ</div>
+    </div>
+    <div class
